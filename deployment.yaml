@@ -1,0 +1,286 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: my-deployment-tag1
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: shared-app
+#   template:
+#     metadata:
+#       labels:
+#         app: shared-app
+#     spec:
+#       imagePullSecrets:
+#       - name: my-dockerhub-secret  # Reference to your Docker Hub secret
+#       containers:
+#       - name: my-container-tag1
+#         image: ibrahimshabaan/react-java-mysql-image:backtag  # Replace with your backend image
+#         env:
+#         - name: MYSQL_HOST
+#           value: db 
+#           # valueFrom:  
+#             # configMapKeyRef:
+#             #   name: backend-config
+#             #   key: MYSQL_HOST
+#         # - name: MYSQL_ROOT_PASSWORD
+#         #   valueFrom:
+#         #     secretKeyRef:
+#         #       name: db-password
+#         #       key: MYSQL_ROOT_PASSWORD
+#         ports:
+#         - containerPort: 8080
+#       restartPolicy: Always
+
+# ---
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: my-deployment-tag3
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: shared-app
+#   template:
+#     metadata:
+#       labels:
+#         app: shared-app
+#     spec:
+#       imagePullSecrets:
+#       - name: my-dockerhub-secret  # Reference to your Docker Hub secret
+#       containers:
+#       - name: my-container-tag3
+#         image: ibrahimshabaan/react-java-mysql-image:dbtag
+#         # env:
+#         # - name: MYSQL_ROOT_PASSWORD
+#         #   valueFrom:
+#         #     secretKeyRef:
+#         #       name: db-password
+#         #       key: MYSQL_ROOT_PASSWORD
+#         ports:
+#         - containerPort: 3306
+#         volumeMounts:
+#         - mountPath: /var/lib/mysql
+#           name: db-data
+#         readinessProbe:
+#           exec:
+#             command: ["mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+#           initialDelaySeconds: 5
+#           periodSeconds: 10
+#       volumes:
+#       - name: db-data
+#         persistentVolumeClaim:
+#           claimName: db-pvc
+# ---
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: my-deployment-tag2
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: shared-app
+#   template:
+#     metadata:
+#       labels:
+#         app: shared-app
+#     spec:
+#       imagePullSecrets:
+#       - name: my-dockerhub-secret  # Reference to your Docker Hub secret
+#       containers:
+#       - name: my-container-tag2
+#         image: ibrahimshabaan/react-java-mysql-image:fronttag  # Replace with your frontend image
+#         ports:
+#         - containerPort: 3005
+#       volumes:
+#       - name: frontend-src
+#         emptyDir: {}
+#       restartPolicy: Always
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # apiVersion: apps/v1
+# # kind: Deployment
+# # metadata:
+# #   name: my-deployment-tag1
+# # spec:
+# #   replicas: 1
+# #   selector:
+# #     matchLabels:
+# #       app: shared-app        # Common label for Service to connect
+# #       component: one
+# #   template:
+# #     metadata:
+# #       labels:
+# #         app: shared-app
+# #         component: one
+# #     spec:
+# #       imagePullSecrets:
+# #       - name: my-dockerhub-secret  # Reference to your Docker Hub secret
+# #       containers:
+# #       - name: my-container-tag1
+# #         image: ibrahimshabaan/react-java-mysql-image:backtag  # Replace with your Docker Hub image and tag
+# #         ports:
+# #         - containerPort: 3000
+# # #--------------------------------------------------------------------------------------------------------------------------------
+# # ---
+# # apiVersion: apps/v1
+# # kind: Deployment
+# # metadata:
+# #   name: my-deployment-tag2
+# # spec:
+# #   replicas: 1
+# #   selector:
+# #     matchLabels:
+# #       app: shared-app        # Common label for Service to connect
+# #       component: two
+# #   template:
+# #     metadata:
+# #       labels:
+# #         app: shared-app
+# #         component: two
+# #     spec:
+# #       imagePullSecrets:
+# #       - name: my-dockerhub-secret  # Reference to your Docker Hub secret
+# #       containers:
+# #       - name: my-container-tag2
+# #         image: ibrahimshabaan/react-java-mysql-image:fronttag  # Replace with your Docker Hub image and tag
+# #         ports:
+# #         - containerPort: 3000
+# # #--------------------------------------------------------------------------------------------------------------------------------
+
+# # ---
+# # apiVersion: apps/v1
+# # kind: Deployment
+# # metadata:
+# #   name: my-deployment-tag3
+# # spec:
+# #   replicas: 1
+# #   selector:
+# #     matchLabels:
+# #       app: shared-app        # Common label for Service to connect
+# #       component: three
+# #   template:
+# #     metadata:
+# #       labels:
+# #         app: shared-app
+# #         component: three
+# #     spec:
+# #       imagePullSecrets:
+# #       - name: my-dockerhub-secret  # Reference to your Docker Hub secret
+# #       containers:
+# #       - name: my-container-tag3
+# #         image: ibrahimshabaan/react-java-mysql-image:dbtag  # Replace with your Docker Hub image and tag
+# #         ports:
+# #         - containerPort: 3000
+# # #--------------------------------------------------------------------------------------------------------------------------------
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1  # Adjust based on your scaling needs
+  selector:
+    matchLabels:
+      app: shared-app
+  template:
+    metadata:
+      labels:
+        app: shared-app
+    spec:
+      containers:
+        - name: backend
+          image: ibrahimshabaan/react-java-mysql-image:backtag  # Replace with your backend image
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MYSQL_HOST
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: MYSQL_ROOT_PASSWORD
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shared-app
+  template:
+    metadata:
+      labels:
+        app: shared-app
+    spec:
+      containers:
+        - name: mariadb
+          image: ibrahimshabaan/react-java-mysql-image:dbtag  # Use the appropriate MariaDB version
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: MYSQL_ROOT_PASSWORD
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: db-storage
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: db-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1  # Adjust based on your scaling needs
+  selector:
+    matchLabels:
+      app: shared-app
+  template:
+    metadata:
+      labels:
+        app: shared-app
+    spec:
+      containers:
+        - name: frontend
+          image: ibrahimshabaan/react-java-mysql-image:fronttag  # Replace with your frontend image
+          ports:
+            - containerPort: 3005
